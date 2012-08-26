@@ -11,12 +11,13 @@ set MYSQL_PASSWORD=
 
 set BUGZILLA_ANSWERS=files\answers.txt
 set DB_SETUP_SCRIPT=files\createdb.sql
+set LOCALCONFIG=files\localconfig
 
 set ADDON=Bugzilla
 
 set BIN=installer\bin
 REM using %MYTMP% in this script because install-module.pl fails to install
-REM some modules if %TMP% is changed from default.
+REM some modules if %TMP% is changed from default. might need to open a bug with bugzilla
 set MYTMP=installer\temp
 
 set WAMP=c:\wamp
@@ -54,7 +55,9 @@ REM unzip the downloaded source files and install them
 echo 	Extracting the files from the downloaded archive...
 gzip.exe -d %MYTMP%\%BUGZILLA_FILE%.tar.gz
 REM FIXME tar and the -C switch doesn't want to work with %MYTMP%. currently treats
-REM installer\temp as installer + \t + emp
+REM installer\temp as installer + \t + emp. might be able to resolve by using a different
+REM tar binary for windows. (unxutils?). this might also keep installer\bin cleaner by not
+REM requiring the dll dependancies.
 tar.exe -xf %MYTMP%\%BUGZILLA_FILE%.tar -C "installer\\temp"
 
 REM install the binary files in the WampServer install directory
@@ -73,7 +76,6 @@ REM FIXME install-module.pl will not work unless in the bugzilla install directo
 echo 	Installing extra Perl modules needed by Bugzilla...
 echo 		This could take several minutes. Please be patient.
 cd %WAMP_BUGZILLA%
-REM FIXME: install-module.pl fails to install some modules because we changed %TMP%. need to figure out why this occurs or open bug with bugzilla
 perl install-module.pl --all > NUL 2>&1
 cd %~dp0%
 
@@ -83,17 +85,19 @@ copy wamp\alias\%BUGZILLA_ALIAS% %WAMP_ALIAS%
 
 REM fix shbang so windows can guess CGI interpreter without requiring registry edits
 for /R %WAMP_BUGZILLA% %%i in (*.cgi *.pl) do perl -p -i.bak -e "s@/usr/bin/@@" %%i
+REM FIXME getting some access denied errors on delete.
 for /R %WAMP_BUGZILLA% %%i in (*.bak) do del %%i
 
 REM setup MySQL database/user for Bugzilla
 echo 	Setting up the %ADDON% database
-REM FIXME: automated login does not work. still getting prompted
-mysql -u %MYSQL_USER% -p "%MYSQL_PASSWORD%" < %DB_SETUP_SCRIPT%
-REM FIXME: checksetup needs to be run at least once so that localconfig can
-REM FIXME: can be generated. this might be skipped by just copying a default
-REM FIXME: localconfig and then only having to run checksetup.pl once
-perl %WAMP_BUGZILLA%\checksetup.pl --check-modules > NUL 2>&1
-perl %WAMP_BUGZILLA%\checksetup.pl > NUL 2>&1 < %BUGZILLA_ANSWERS%
+mysql -u %MYSQL_USER% < %DB_SETUP_SCRIPT%
+copy %LOCALCONFIG% %WAMP_BUGZILLA%
+REM FIXME had trouble running answer script when not inside %WAMP_BUGZILLA%
+REM FIXME answers.txt is hard coded.
+REM FIXME checksetup.pl appears to look for files relative to path of script.
+copy %BUGZILLA_ANSWERS% %WAMP_BUGZILLA%
+perl %WAMP_BUGZILLA%\checksetup.pl answers.txt > NUL 2>&1 
+del %WAMP_BUGZILLA%\answers.txt
 
 REM clean up temp files
 echo 	Cleaning up temp files...
