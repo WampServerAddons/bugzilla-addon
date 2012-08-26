@@ -1,10 +1,9 @@
 @echo OFF
 REM script requires mysql to be running
-REM TODO use the call command to set some variables common to both the installer/uninstaller
-set BUGZILLA_VERSION=4.2rc1
+set BUGZILLA_VERSION=4.2
 set APACHE_VERSION=2.2.21
-set WAMP_VERSION=2.2a
-set MYSQL_VERSION=5.5.16
+set WAMP_VERSION=2.2d
+set MYSQL_VERSION=5.5.20
 
 set MYSQL_USER=root
 set MYSQL_PASSWORD=
@@ -54,10 +53,7 @@ wget.exe -nd -q -P %MYTMP% %BUGZILLA_DOWNLOAD%
 REM unzip the downloaded source files and install them
 echo 	Extracting the files from the downloaded archive...
 gzip.exe -d %MYTMP%\%BUGZILLA_FILE%.tar.gz
-REM FIXME tar and the -C switch doesn't want to work with %MYTMP%. currently treats
-REM installer\temp as installer + \t + emp. might be able to resolve by using a different
-REM tar binary for windows. (unxutils?). this might also keep installer\bin cleaner by not
-REM requiring the dll dependancies.
+REM FIXME: 1, 2
 tar.exe -xf %MYTMP%\%BUGZILLA_FILE%.tar -C "installer\\temp"
 
 REM install the binary files in the WampServer install directory
@@ -65,23 +61,16 @@ echo 	Moving the files to the WampServer install directory...
 ren %MYTMP%\%BUGZILLA_FILE% %BUGZILLA_DIR%
 move %MYTMP%\%BUGZILLA_DIR% %WAMP_APPS%
 
-REM install extra perl modules needed by Bugzilla
-REM FIXME: this needs cleaned up: this installs some extras that aren't
-REM FIXME really needed (db drivers and such) maybe have a minimal install list
-REM FIXME of missing modules and install them and then a full which is everything
-REM FIXME except the unneccessary db modules. Also need to better understand
-REM FIXME what's going on so that packaging/removal is easier.
-
-REM FIXME install-module.pl will not work unless in the bugzilla install directory. might need to open bug
-echo 	Installing extra Perl modules needed by Bugzilla...
-echo 		This could take several minutes. Please be patient.
-cd %WAMP_BUGZILLA%
-perl install-module.pl --all > NUL 2>&1
-cd %~dp0%
-
 REM install the apache config file for Bugzilla
 echo 	Installing %ADDON% configuration files...
 copy wamp\alias\%BUGZILLA_ALIAS% %WAMP_ALIAS%
+
+REM install extra perl modules needed by Bugzilla
+echo 	Installing extra Perl modules needed by Bugzilla...
+echo 		This could take several minutes. Please be patient.
+pushd %WAMP_BUGZILLA%
+REM FIXME: 3
+perl install-module.pl --all > NUL 2>&1
 
 REM fix shbang so windows can guess CGI interpreter without requiring registry edits
 for /R %WAMP_BUGZILLA% %%i in (*.cgi *.pl) do perl -p -i.bak -e "s@/usr/bin/@@" %%i
@@ -92,12 +81,11 @@ REM setup MySQL database/user for Bugzilla
 echo 	Setting up the %ADDON% database
 mysql -u %MYSQL_USER% < %DB_SETUP_SCRIPT%
 copy %LOCALCONFIG% %WAMP_BUGZILLA%
-REM FIXME had trouble running answer script when not inside %WAMP_BUGZILLA%
-REM FIXME answers.txt is hard coded.
-REM FIXME checksetup.pl appears to look for files relative to path of script.
+REM FIXME 7
 copy %BUGZILLA_ANSWERS% %WAMP_BUGZILLA%
 perl %WAMP_BUGZILLA%\checksetup.pl answers.txt > NUL 2>&1 
 del %WAMP_BUGZILLA%\answers.txt
+popd
 
 REM clean up temp files
 echo 	Cleaning up temp files...
