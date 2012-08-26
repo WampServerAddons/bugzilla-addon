@@ -1,5 +1,0 @@
-localhost
-admin@example.com
-admin real name
-admin password
-verify password

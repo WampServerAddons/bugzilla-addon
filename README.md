@@ -40,6 +40,16 @@ Manual install instructions:
      edits to the registry.
  13. restart Wamp
 
+answers.txt file format:
+ The answers.txt file contains all of the answers to input into checksetup.pl. The file
+ contains one answer per line. Here are the questions checksetup.pl asks.
+
+ 1. SMTP hostname
+ 2. administrator email address
+ 3. administrator real name
+ 4. admin password
+ 5. verify admin password
+
 Using the Installer:
  usage: installer.bat
 
