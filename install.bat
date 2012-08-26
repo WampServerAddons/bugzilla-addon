@@ -100,9 +100,8 @@ perl %WAMP_BUGZILLA%\checksetup.pl < %BUGZILLA_ANSWERS%
 pause
 
 REM fix shbang so windows can guess CGI interpreter without requiring registry edits
-REM FIXME clean up this regex
-REM FIXME windows perl can not do inplace edits without backup need to delete backup files after. need to delete those
-for /R %WAMP_BUGZILLA% %%i in (*.cgi *.pl) do perl -p -i'.bak' -e "s@/usr/bin/@@" %%i
+for /R %WAMP_BUGZILLA% %%i in (*.cgi *.pl) do perl -p -i.bak -e "s@/usr/bin/@@" %%i
+for /R %WAMP_BUGZILLA% %%i in (*.bak) do del %%i
 pause
 
 REM clean up temp files
