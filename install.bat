@@ -49,21 +49,25 @@ mkdir %MYTMP%
 REM download Bugzilla archive to temp directory
 echo 	Downloading %ADDON% binaries to temp directory...
 wget.exe -nd -q -P %MYTMP% %BUGZILLA_DOWNLOAD%
+if not %ERRORLEVEL%==0 (echo FAIL: could not download %ADDON% binaries& pause& exit 1)
 
 REM unzip the downloaded source files and install them
 echo 	Extracting the files from the downloaded archive...
 gzip.exe -d %MYTMP%\%BUGZILLA_FILE%.tar.gz
 REM FIXME: 1, 2
 tar.exe -xf %MYTMP%\%BUGZILLA_FILE%.tar -C "installer\\temp"
+if not %ERRORLEVEL%==0 (echo FAIL: could not extract downloaded files& pause& exit 1)
 
 REM install the binary files in the WampServer install directory
 echo 	Moving the files to the WampServer install directory...
 ren %MYTMP%\%BUGZILLA_FILE% %BUGZILLA_DIR%
 xcopy /E /I /Q %MYTMP%\%BUGZILLA_DIR% %WAMP_APPS%\%BUGZILLA_DIR%
+if not %ERRORLEVEL%==0 (echo FAIL: could not move the files& pause& exit 1)
 
 REM install the apache config file for Bugzilla
 echo 	Installing %ADDON% configuration files...
 copy wamp\alias\%BUGZILLA_ALIAS% %WAMP_ALIAS%
+if not %ERRORLEVEL%==0 (echo FAIL: could not install WampServer alias file& pause& exit 1)
 
 REM install extra perl modules needed by Bugzilla
 echo 	Installing extra Perl modules needed by Bugzilla...
