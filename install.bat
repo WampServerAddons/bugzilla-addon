@@ -59,7 +59,7 @@ tar.exe -xf %MYTMP%\%BUGZILLA_FILE%.tar -C "installer\\temp"
 REM install the binary files in the WampServer install directory
 echo 	Moving the files to the WampServer install directory...
 ren %MYTMP%\%BUGZILLA_FILE% %BUGZILLA_DIR%
-move %MYTMP%\%BUGZILLA_DIR% %WAMP_APPS%
+xcopy /E /I /Q %MYTMP%\%BUGZILLA_DIR% %WAMP_APPS%\%BUGZILLA_DIR%
 
 REM install the apache config file for Bugzilla
 echo 	Installing %ADDON% configuration files...
@@ -71,6 +71,7 @@ echo 		This could take several minutes. Please be patient.
 pushd %WAMP_BUGZILLA%
 REM FIXME: 3
 perl install-module.pl --all > NUL 2>&1
+popd
 
 REM fix shbang so windows can guess CGI interpreter without requiring registry edits
 for /R %WAMP_BUGZILLA% %%i in (*.cgi *.pl) do perl -p -i.bak -e "s@/usr/bin/@@" %%i
@@ -83,6 +84,8 @@ mysql -u %MYSQL_USER% < %DB_SETUP_SCRIPT%
 copy %LOCALCONFIG% %WAMP_BUGZILLA%
 REM FIXME 7
 copy %BUGZILLA_ANSWERS% %WAMP_BUGZILLA%
+
+pushd %WAMP_BUGZILLA%
 perl %WAMP_BUGZILLA%\checksetup.pl answers.txt > NUL 2>&1 
 del %WAMP_BUGZILLA%\answers.txt
 popd
@@ -94,3 +97,4 @@ rd /S /Q %MYTMP%
 echo %ADDON% is installed successfully. Please restart WampServer.
 
 pause
+
