@@ -1,0 +1,16 @@
+#$answer{'db_host'}   = 'localhost';
+#$answer{'db_driver'} = 'mysql';
+#$answer{'db_port'}   = 0;
+#$answer{'db_name'}   = 'bugs';
+#$answer{'db_user'}   = 'bugs';
+#$answer{'db_pass'}   = '';
+
+$answer{'urlbase'} = 'http://localhost/bugzilla/';
+
+$answer{'ADMIN_EMAIL'} = 'admin@example.com';
+$answer{'ADMIN_PASSWORD'} = 'bugzilla';
+$answer{'ADMIN_REALNAME'} = 'WampServer Admin';
+
+$answer{'SMTP_SERVER'} = 'localhost';
+
+$answer{'NO_PAUSE'} = 1
