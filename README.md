@@ -35,7 +35,10 @@ Manual install instructions:
     are installed. This will also generate the localconfig file need to run bugzilla
  10. make any necessary changes to localconfig
  11. run 'checksetup.pl' again. This complete any needed configuration changes.
- 12. restart Wamp
+ 12. remove '/usr/bin/' path from the first line of every .cgi and .pl file. This is
+     so Apache can find the perl executable to run the CGI scripts without requiring
+     edits to the registry.
+ 13. restart Wamp
 
 Using the Installer:
  usage: installer.bat
