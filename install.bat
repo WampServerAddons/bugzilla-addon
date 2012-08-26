@@ -4,6 +4,13 @@ REM TODO use the call command to set some variables common to both the installer
 set BUGZILLA_VERSION=4.2rc1
 set APACHE_VERSION=2.2.21
 set WAMP_VERSION=2.2a
+set MYSQL_VERSION=5.5.16
+
+set MYSQL_USER=root
+set MYSQL_PASSWORD=
+
+set BUGZILLA_ANSWERS="answers.txt"
+set DB_SETUP_SCRIPT=%CD%\files\createdb.sql
 
 set ADDON=Bugzilla
 
@@ -11,19 +18,13 @@ set BIN=installer\bin
 set TMP=installer\temp
 
 set WAMP=c:\wamp
-set WAMP_BUGZILLA=%WAMP%\apps\bugzilla%BUGZILLA_VERSION%
-set WAMP_APACHE_MODULES=%WAMP%\bin\apache\apache%APACHE_VERSION%\modules
-
-set MYSQL_VERSION=5.5.16
-set MYSQL_USER=root
-set MYSQL_PASSWORD=
+set WAMP_APPS=%WAMP%\apps
 set WAMP_MYSQL=%WAMP%\bin\mysql\mysql%MYSQL_VERSION%\bin
-set DB_SETUP_SCRIPT=%CD%\files\createdb.sql
+set WAMP_BUGZILLA=%WAMP_APPS%\bugzilla%BUGZILLA_VERSION%
 
 set BUGZILLA_FILE=bugzilla-%BUGZILLA_VERSION%
 set BUGZILLA_DIR=Bugzilla%BUGZILLA_VERSION%
 set BUGZILLA_BIN=%WAMP_BUGZILLA%
-set BUGZILLA_ANSWERS="answers.txt"
 
 set BUGZILLA_DOWNLOAD=http://ftp.mozilla.org/pub/mozilla.org/webtools/%BUGZILLA_FILE%.tar.gz
 
@@ -59,7 +60,7 @@ echo 	Moving the files to the WampServer install directory...
 move %TMP%\%BUGZILLA_DIR% %WAMP%\apps
 
 REM install the apache config file for Bugzilla
-REM FIXME: may be able to skip moving to%TMP% and just copy to %WAMP_ALIAS%
+REM FIXME: may be able to skip moving to%TMP% and just copy to %WAMP_APPS%
 REM FIXME: and rename during that copy command
 echo 	Installing %ADDON% configuration files...
 copy wamp\alias\%BUGZILLA_ALIAS% %WAMP%\alias
